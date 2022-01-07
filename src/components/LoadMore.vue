@@ -32,7 +32,8 @@ export default {
       limit: 10,
       initialLoad: true,
       isLoading: false,
-      savedScroll: null
+      savedScroll: null,
+      scrollGap: 60
     }
   },
   methods: {
@@ -76,7 +77,7 @@ export default {
     loadMore(event) {
       const quotesContainerTop = this.$refs.quotesContainer.getBoundingClientRect().top;
       const quotesListTop = this.$refs.quotesList.getBoundingClientRect().top;
-      if (event.deltaY < 0 && quotesContainerTop < quotesListTop + 60 && !this.isLoading) {
+      if (event.deltaY < 0 && quotesContainerTop < (quotesListTop + this.scrollGap) && !this.isLoading) {
         this.saveScrollPosition();
         this.page++;
         this.getData();
