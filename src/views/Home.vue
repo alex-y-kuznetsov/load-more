@@ -5,7 +5,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import LoadMore from '@/components/LoadMore.vue'
 
 export default {
@@ -15,3 +14,9 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="less">
+.home {
+  height: 100%;
+}
+</style>
