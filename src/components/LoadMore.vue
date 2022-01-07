@@ -6,7 +6,6 @@
           class="quotes-item"
           v-for="quote in quotes"
           :key="quote._id"
-          :id="quote._id"
         >
           <div class="quote-text">{{ quote.quoteText }}</div>
           <div class="quote-author">{{ quote.quoteAuthor }}</div>
