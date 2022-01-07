@@ -1,7 +1,7 @@
 <template>
   <div v-if="isInit" class="quotes-cover">
-    <div class="quotes" ref="quotesContainer">
-      <ul class="quotes-list">
+    <div class="quotes" ref="quotesContainer" @wheel="loadMore($event)">
+      <ul class="quotes-list" ref="quotesList">
         <li 
           class="quotes-item"
           v-for="quote in quotes"
@@ -11,8 +11,10 @@
           <div class="quote-author">{{ quote.quoteAuthor }}</div>
         </li>
       </ul>
+      <div class="loader" v-if="isLoading">
+        <div class="loader-text">Loading quotes...</div>
+      </div>
     </div>
-    <button class="load-more" @click.stop="loadMore">Load More</button>
   </div>
 </template>
 
@@ -27,7 +29,8 @@ export default {
       quotes: [],
       page: 1,
       limit: 10,
-      initialLoad: true
+      initialLoad: true,
+      isLoading: false
     }
   },
   methods: {
@@ -35,6 +38,7 @@ export default {
       this.getData();
     },
     getData() {
+      this.isLoading = true;
       let dataParams = {
         page: this.page,
         limit: this.limit
@@ -44,20 +48,25 @@ export default {
       }).then((response) => {
         this.quotes = [...response.data.data, ...this.quotes];
         this.isInit = true;
+        this.isLoading = false;
       }).then(() => {
         if (this.initialLoad) {
           this.scrollToBottom();
+          this.initialLoad = false;
         }
-        this.initialLoad = false;
       });
     },
     scrollToBottom() {
-      let quotesContainer = this.$refs.quotesContainer;
+      const quotesContainer = this.$refs.quotesContainer;
       quotesContainer.scrollTop = quotesContainer.scrollHeight;
     },
-    loadMore() {
-      this.page++;
-      this.getData();
+    loadMore(event) {
+      const quotesContainerTop = this.$refs.quotesContainer.getBoundingClientRect().top;
+      const quotesListTop = this.$refs.quotesList.getBoundingClientRect().top;
+      if (event.deltaY < 0 && quotesContainerTop < quotesListTop + 160 && !this.isLoading) {
+        this.page++;
+        this.getData();
+      }
     }
   },
   created() {
@@ -78,10 +87,11 @@ export default {
   margin: auto;
   width: 600px;
   height: 600px;
-  border: 1px solid black;
+  border: 1px solid #000000;
   padding: 10px;
   box-sizing: border-box;
   overflow: auto;
+  position: relative;
 }
 
 .quotes-list {
@@ -104,5 +114,21 @@ export default {
   text-align: right;
   font-size: 12px;
   color: #cccccc;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.loader-text {
+  margin: auto;
 }
 </style>
