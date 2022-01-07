@@ -5,7 +5,8 @@
         <li 
           class="quotes-item"
           v-for="quote in quotes"
-          v-bind:key="quote._id"
+          :key="quote._id"
+          :id="quote._id"
         >
           <div class="quote-text">{{ quote.quoteText }}</div>
           <div class="quote-author">{{ quote.quoteAuthor }}</div>
@@ -30,7 +31,8 @@ export default {
       page: 1,
       limit: 10,
       initialLoad: true,
-      isLoading: false
+      isLoading: false,
+      savedScroll: null
     }
   },
   methods: {
@@ -54,16 +56,28 @@ export default {
           this.scrollToBottom();
           this.initialLoad = false;
         }
+        if (this.savedScroll) {
+          this.loadScrollPosition();
+        }
       });
     },
     scrollToBottom() {
       const quotesContainer = this.$refs.quotesContainer;
       quotesContainer.scrollTop = quotesContainer.scrollHeight;
     },
+    saveScrollPosition() {
+      const quotesContainer = this.$refs.quotesContainer;
+      this.savedScroll = quotesContainer.scrollHeight - quotesContainer.scrollTop;
+    },
+    loadScrollPosition() {
+      const quotesContainer = this.$refs.quotesContainer;
+      quotesContainer.scrollTop = quotesContainer.scrollHeight - this.savedScroll;
+    },
     loadMore(event) {
       const quotesContainerTop = this.$refs.quotesContainer.getBoundingClientRect().top;
       const quotesListTop = this.$refs.quotesList.getBoundingClientRect().top;
-      if (event.deltaY < 0 && quotesContainerTop < quotesListTop + 160 && !this.isLoading) {
+      if (event.deltaY < 0 && quotesContainerTop < quotesListTop + 60 && !this.isLoading) {
+        this.saveScrollPosition();
         this.page++;
         this.getData();
       }
